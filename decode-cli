@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+"""
+This script will be used to evaluate your solution.
+To use python2, change the top of this script to say python2.
+
+The evaluator expects this script to:
+1. Read in ciphertext as first command line argument.
+2. Read in a has_breakpoint flag ("true" or "false") as the second command line
+   argument.
+3. Print the best guess for the plaintext to stdout.
+
+Example usage:
+    ./decode-cli "$(cat data/test/ciphertext.txt)" false
+    ./decode-cli "$(cat data/test/ciphertext_breakpoint.txt)" true
+"""
+
+import sys
+from decode import decode
+
+has_breakpoint = sys.argv[2].lower() == "true"
+print(decode(sys.argv[1], has_breakpoint))
