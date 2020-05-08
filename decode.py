@@ -4,9 +4,9 @@ from utils import *
 
 np.seterr(all='ignore')
 
-STOP_THRESHOLD = 2000
-MAX_ITERS = 10000
-ENSEMBLE_SIZE = 100
+STOP_THRESHOLD = 1000
+MAX_ITERS = 7500
+ENSEMBLE_SIZE = 500
 
 BIGRAM_PS = np.loadtxt('data/letter_transition_matrix.csv', delimiter=',')
 BIGRAM_LOGPS = np.log(BIGRAM_PS + 1e-8).ravel()
@@ -80,42 +80,10 @@ def generate_chain(bigram_counts):
                 maxes = f_new, logp_new
     return maxes, (fs, logps)
 
-def count_bigrams(cipher):
-    bigram_counts = np.zeros((28, 28))
-    for i in range(len(cipher) - 1):
-        bigram_counts[cipher[i+1]][cipher[i]] += 1
-    return bigram_counts
-
-def count_bigrams_over_time(cipher):
-    bigram_counts = np.zeros((len(cipher), 28, 28))
-    for i in range(len(cipher) - 1):
-        bigram_counts[i+1][cipher[i+1]][cipher[i]] += 1
-        bigram_counts[i+1] += bigram_counts[i]
-    return bigram_counts
-
-def permute_bigram_counts(f, bigram_counts):
-    '''Permute bigram counts under permutation f.'''
-    f_inv = np.argsort(f)
-    return bigram_counts[f_inv, :][:, f_inv]
-
-def sample_f_neighbor(f):
-    f_prime = np.copy(f)
-    i1, i2 = np.random.choice(28, 2)
-    f_prime[i1], f_prime[i2] = f_prime[i2], f_prime[i1]
-    return f_prime
-
-def sample_cipher_neighbor(f1, f2, b, ciphertext_length):
-    f1_prime = sample_f_neighbor(f1)
-    f2_prime = sample_f_neighbor(f2)
-    b_prime = (np.random.normal(loc=b, scale=21) % ciphertext_length).astype(np.int)
-    return f1_prime, f2_prime, b_prime
-
-def sample_f(bigram_counts):
-    return np.random.permutation(28)
 
 def initialize_fs(bigram_counts):
     fs = np.zeros((MAX_ITERS, 28), dtype=np.int)
-    fs[0] = sample_f(bigram_counts)
+    fs[0] = sample_f()
     return fs
 
 def initialize_ciphers(bigram_counts, ciphertext_length):
