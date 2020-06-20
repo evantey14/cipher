@@ -18,7 +18,9 @@ def text_to_number(text):
 def number_to_text(nums):
     return ''.join([c(num) for num in nums])
 
-def get_accuracy(original, guess):
+def get_accuracy(original, guess, is_text=False):
+    if is_text:
+        return get_accuracy(text_to_number(original), text_to_number(guess))
     return np.count_nonzero(original == guess) / len(original)
 
 def decode_with_f(f, text):

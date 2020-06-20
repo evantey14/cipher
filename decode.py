@@ -2,17 +2,19 @@ import numpy as np
 
 from utils import *
 
-np.seterr(all='ignore')
+np.seterr(all='ignore') # test server requires silent stdout
 
+# Configure the MCMC
 STOP_THRESHOLD = 1000
-MAX_ITERS = 7500
-ENSEMBLE_SIZE = 500
+MAX_ITERS = 2500
+ENSEMBLE_SIZE = 50
 
+# Load bigram log probabilities and store as a 1D array, adding noise to zero transitions
 BIGRAM_PS = np.loadtxt('data/letter_transition_matrix.csv', delimiter=',')
 BIGRAM_LOGPS = np.log(BIGRAM_PS + 1e-8).ravel()
 
 
-def decode(ciphertext, has_breakpoint):
+def decode(ciphertext, has_breakpoint, debug=False):
     ciphernumbers = text_to_number(ciphertext) # convert to number list for computations
 
     if has_breakpoint:
@@ -36,6 +38,7 @@ def decode(ciphertext, has_breakpoint):
     else:
         f_hat = maxes[0]
         plainnumbers = decode_with_f(f_hat, ciphernumbers)
+
     return number_to_text(plainnumbers)
 
 def generate_chain_with_breakpoint(bigram_counts_over_time):
@@ -80,7 +83,6 @@ def generate_chain(bigram_counts):
                 maxes = f_new, logp_new
     return maxes, (fs, logps)
 
-
 def initialize_fs(bigram_counts):
     fs = np.zeros((MAX_ITERS, 28), dtype=np.int)
     fs[0] = sample_f()
@@ -99,8 +101,13 @@ def initialize_logps(logps0):
     return logps
 
 def log_likelihood(f, bigram_counts):
-    new_bigram_counts = permute_bigram_counts(f, bigram_counts).ravel()
+    """Calculate the log likelihood of ciphertext with a set of bigram counts under cipher f.
 
+    Args:
+        f: length-28 array, representation of substitution cipher.
+        bigram_counts: 28x28 array, bigram frequencies in ciphertext.
+    """
+    new_bigram_counts = permute_bigram_counts(f, bigram_counts).ravel()
     loglikelihood = new_bigram_counts.dot(BIGRAM_LOGPS)
     return loglikelihood
 
