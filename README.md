@@ -6,6 +6,7 @@ Given a ciphertext encoded with an unknown substitution cipher, we use MCMC with
 We also extend the code for ciphertexts encoded with two different substitution ciphers (the first is used until some unknown breakpoint location in the plaintext, then the second is used for the rest of the plaintext).
 
 `reports/` contain a more complete writeup of the problem, methods, and results.
+`demo.ipynb` contins a quick demo.
 
 # Existing optimizations
 
